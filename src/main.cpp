@@ -9,6 +9,8 @@
 #define MQTT_HOST IPAddress(192, 168, 43, 222)
 // #define MQTT_HOST "test.mosquitto.org"
 #define MQTT_PORT 1883
+#define MQTT_USER "iot-class"
+#define MQTT_PASSWORD "adjsnfdsaYwuefuhq30isazx"
 
 AsyncMqttClient mqttClient;
 Ticker mqttReconnectTimer;
@@ -138,6 +140,7 @@ void setup() {
   mqttClient.onMessage(onMqttMessage);
   mqttClient.onPublish(onMqttPublish);
   mqttClient.setServer(MQTT_HOST, MQTT_PORT);
+  mqttClient.setCredentials(MQTT_USER, MQTT_PASSWORD);
 
   connectToWifi();
 }
@@ -145,13 +148,18 @@ void setup() {
 void loop() {
   /* long hum = random(101);
   Serial.println(hum);
-  char mystr[40];
-  sprintf(mystr, "{\"humedad\": %u}", hum);
+  
   mqttClient.publish("IUE/bloque7/piso2/salon201/medicion", 0, true, mystr); */
   float hum = analogRead(A0);
 
   float porc_hum = (-0.236*hum)+241;
-  Serial.println(porc_hum);
+  float temp = porc_hum / 2;
 
-  delay(5000);
+  
+  Serial.println(porc_hum);
+  char mystr[100];
+  sprintf(mystr, "{\"hum_suelo\": %f, \"hum_rel\": %f, \"temperatura\": %.2f}", porc_hum, hum, temp);
+  mqttClient.publish("IUE/bloque7/piso2/salon201/balcon/medicion", 0, true, mystr);
+
+  delay(1000);
 }
